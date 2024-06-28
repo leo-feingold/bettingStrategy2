@@ -5,6 +5,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 import re
+from datetime import datetime
+
+
 
 # Set up the Selenium WebDriver
 driver = webdriver.Safari()
@@ -41,7 +44,9 @@ else:
     print("Error with pre-set columns. See web page.")
     raise ValueError(f"Scraped columns looked like: {book_names_from_page}")
 
-book_names = ["Best Odds", "Fanduel (NY)", "BetMGM (NY)", "Draft Kings (NJ)", "Caesars (NY)", "BetRivers (NY)", "Bally Bet NY", "BetMGM (NJ)"]
+# will need to update this every time
+#book_names = ["Best Odds", "Fanduel (NY)", "BetMGM (NY)", "Draft Kings (NJ)", "Caesars (NY)", "BetRivers (NY)", "Bally Bet NY", "BetMGM (NJ)"]
+book_names = ["Best Odds", "Fanduel (NY)", "BetMGM (NY)", "Draft Kings (NJ)", "BetRivers (NY)", "Bally Bet NY", "BetMGM (NJ)"]
 
 
 # Debugging outputs
@@ -73,6 +78,10 @@ for i in range(0, len(team_names), 2):  # Step through teams in pairs
 df = pd.DataFrame.from_dict(odds_dict, orient='index')
 
 # Save the DataFrame to a CSV file
-df.to_csv('odds_data.csv')
+now = datetime.now()
+current_time = now.strftime("%H:%M:%S")
+print("Current Time =", current_time)
+
+df.to_csv(f'{now}_odds_data.csv')
 
 print('Data has been saved to odds_data.csv')
