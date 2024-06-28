@@ -30,7 +30,30 @@ def sum_implied_probabilities(df):
         summed_probabilities.append((team1, team2, team1_prob + team2_prob))
     return summed_probabilities
 
+def calc_bets(df, game, capital_per_bet):
+    team1, team2, total_prob = game
+    team1_prob = df.loc[team1, "implied_probability"]
+    team2_prob = df.loc[team2, "implied_probability"]
+    if ((team1_prob + team2_prob) != total_prob):
+        print("Something is wrong...")
+    else:
+        team1_ratio = team1_prob/total_prob
+        team2_ratio = team2_prob/total_prob
+        team1_investment = team1_ratio * capital_per_bet
+        team2_investment = team2_ratio * capital_per_bet
+
+    return team1_investment, team2_investment
+
+def calc_payout(capital_per_bet, odds):
+    if odds < 0:
+        odds = abs(odds)
+        profit = (100/odds * capital_per_bet)
+    else:
+        profit = (odds/100 * capital_per_bet)
+    return profit
+
 def main():
+    capital_per_bet = 1000
     csv = "/Users/leofeingold/Desktop/bettingStrategy2/Data_CSVs/odds_data.csv"
     data = load_data(csv)
     data = process_data(data)
@@ -41,12 +64,24 @@ def main():
     data = append_IP_to_df(data)
     probabilities = sum_implied_probabilities(data)
     print(probabilities)
-    for match in probabilities:
-        team1, team2, total_prob = match
+    for game in probabilities:
+        team1, team2, total_prob = game
         if total_prob < 100:
             print(f"\n{team1} vs {team2}: Total Implied Probability = {total_prob:.2f}%")
-    print(f"\n{data.head()}")
-    
+            team1_investment, team2_investment = calc_bets(data, game, capital_per_bet)
+            team1_odds = data.loc[team1, "Best Odds"]
+            team2_odds = data.loc[team2, "Best Odds"]
+            print(f"{team1} Bet Size: {team1_investment}, {team2} Bet Size: {team2_investment}")
+            print(f"{team1} Odds: {team1_odds}, {team2} Odds: {team2_odds}")
+            profit = calc_payout(team1_investment, team1_odds) - team2_investment
+            # (both work)
+            #profit = calc_payout(team2_investment, team2_odds) - team1_investment
+            print(f"Guaranteed Profit: {profit}")
+            
+            if ((team1_investment+team2_investment) != capital_per_bet):
+                print("Something is wrong...")
+            else:
+                print(f"Guaranteed ROI (%): {(profit/(capital_per_bet)) * 100}%")
 
 if __name__ == "__main__":
     main()
