@@ -1,12 +1,15 @@
 import pandas as pd
 
+
 def load_data(csv):
     df = pd.read_csv(csv)
     return df
 
 def process_data(df):
     df = df.apply(lambda x: x.replace('+', '') if isinstance(x, str) else x)
+    # need to update this as well
     df[["Best Odds","Fanduel (NY)","BetMGM (NY)","Draft Kings (NJ)","Caesars (NY)","BetRivers (NY)","Bally Bet NY","BetMGM (NJ)"]] = df[["Best Odds","Fanduel (NY)","BetMGM (NY)","Draft Kings (NJ)","Caesars (NY)","BetRivers (NY)","Bally Bet NY","BetMGM (NJ)"]].apply(pd.to_numeric)
+    #df[["Best Odds","Fanduel (NY)","BetMGM (NY)","Draft Kings (NJ)","BetRivers (NY)","Bally Bet NY","BetMGM (NJ)"]] = df[["Best Odds","Fanduel (NY)","BetMGM (NY)","Draft Kings (NJ)","BetRivers (NY)","Bally Bet NY","BetMGM (NJ)"]].apply(pd.to_numeric)
     return df
 
 def calc_implied_prob(odds):
@@ -53,7 +56,7 @@ def calc_payout(capital_per_bet, odds):
     return profit
 
 def main():
-    capital_per_bet = 1000
+    capital_per_bet = 100
     csv = "/Users/leofeingold/Desktop/bettingStrategy2/Data_CSVs/odds_data.csv"
     data = load_data(csv)
     data = process_data(data)
@@ -74,7 +77,7 @@ def main():
             print(f"{team1} Bet Size: {team1_investment}, {team2} Bet Size: {team2_investment}")
             print(f"{team1} Odds: {team1_odds}, {team2} Odds: {team2_odds}")
             profit = calc_payout(team1_investment, team1_odds) - team2_investment
-            # (both work)
+            #(both work)
             #profit = calc_payout(team2_investment, team2_odds) - team1_investment
             print(f"Guaranteed Profit: {profit}")
             
